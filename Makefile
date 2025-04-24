@@ -1,2 +1,9 @@
+all:	monoid.o writer.o	
+
 monoid.o:	monoid.cpp
 	clang -std=c++2a -c monoid.cpp
+	
+writer.o:	writer.cpp
+	clang -c writer.cpp
+	
+	
