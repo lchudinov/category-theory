@@ -1,4 +1,4 @@
-all:	monoid.o writer.o	optional.o contact.o
+all:	monoid.o writer.o	optional.o contact.o list.o
 
 monoid.o:	monoid.cpp
 	clang -std=c++2a -c monoid.cpp
@@ -11,5 +11,8 @@ optional.o:	optional.cpp
 
 contact.o:	contact.cpp
 	clang -c contact.cpp
+	
+list.o:	list.cpp
+	clang -c list.cpp
 	
 	

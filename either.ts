@@ -1,0 +1,1 @@
+type Either<A, B> = {left: true; a: A} | {right: true; b: B};
