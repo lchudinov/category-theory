@@ -1,48 +1,77 @@
 #include <cmath>
+#include <functional>
 
 using namespace std;
 
-template<class A> class optional {
+template <class A>
+class optional
+{
   bool _isValid;
   A _value;
-  public:
-    optional() : _isValid(false) {}
-    optional(A v) : _isValid(true), _value(v) {}
-    bool isValid() const { return _isValid; }
-    A value() const { return _value; }
+
+public:
+  optional() : _isValid(false) {}
+  optional(A v) : _isValid(true), _value(v) {}
+  bool isValid() const { return _isValid; }
+  A value() const { return _value; }
 };
 
-auto const compose = [](auto m1, auto m2) {
-  return [m1, m2](auto x) {
+auto const compose = [](auto m1, auto m2)
+{
+  return [m1, m2](auto x)
+  {
     auto p1 = m1(x);
-    if (p1.isValid()) {
+    if (p1.isValid())
+    {
       return m2(p1.value());
-    } else {
-      return p1;  
+    }
+    else
+    {
+      return p1;
     }
   };
 };
 
-template<class A> optional<A> identity(A x) {
+template <class A>
+optional<A> identity(A x)
+{
   return optional<A>{x};
 }
 
-optional<double> safe_root(double x) {
-  if (x > 0) {
+optional<double> safe_root(double x)
+{
+  if (x > 0)
+  {
     return optional<double>{sqrt(x)};
-  } else {
+  }
+  else
+  {
     return optional<double>{};
   }
 }
 
-optional<double> safe_reciprocal(double x) {
-  if (x != 0.0) {
-    return optional<double>{1/x};
-  } else {
+optional<double> safe_reciprocal(double x)
+{
+  if (x != 0.0)
+  {
+    return optional<double>{1 / x};
+  }
+  else
+  {
     return optional<double>{};
   }
 }
 
-optional<double> safe_root_reciprocal(double x) {
+optional<double> safe_root_reciprocal(double x)
+{
   return compose(safe_reciprocal, safe_root)(x);
+}
+
+template <class A, class B>
+optional<B> fmap(std::function<B(A)> f, optional<A> opt)
+{
+  if (!opt.isValid())
+    return optional<B>{};
+  else
+    return optional<B>{f(opt.value())};
 }
