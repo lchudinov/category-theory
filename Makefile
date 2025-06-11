@@ -1,4 +1,4 @@
-all:	monoid.o writer.o	optional.o contact.o list.o shape.o list-functor.o functors-as-containers.o
+all:	monoid.o writer.o	optional.o contact.o list.o shape.o list-functor.o functors-as-containers.o functors.o
 
 monoid.o:	monoid.cpp
 	clang -std=c++2a -c monoid.cpp
@@ -23,5 +23,8 @@ list-functor.o:	list-functor.cpp
 	
 functors-as-containers.o:	functors-as-containers.cpp
 	clang -c functors-as-containers.cpp
+
+functors.o:	functors.cpp
+	clang -c functors.cpp
 	
 	
