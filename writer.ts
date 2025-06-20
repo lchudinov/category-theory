@@ -14,3 +14,23 @@ const upCase = (s: string): Writer<string> => [s.toUpperCase(), 'upCase '];
 const toWords = (s:string): Writer<string[]> => [s.split(''), 'toWords '];
 
 const process = (s:string): Writer<string[]> => composeWriter(upCase, toWords)(s);
+
+function bind<A, B>(
+  ma: Writer<A>,
+  f: (a: A) => Writer<B>
+): Writer<B> {
+  const [a, log1] = ma;
+  const [b, log2] = f(a);
+  return [b, log1 + log2];
+}
+
+function fmap<A, B>(f: (a: A) => B): (ma: Writer<A>) => Writer<B> {
+  return (ma: Writer<A>) =>
+    bind(ma, (x) => ret(f(x)));
+}
+
+function fmapViaCompose<A, B>(f: (a: A) => B): (ma: Writer<A>) => Writer<B> {
+  const id = (x: Writer<A>) => x;
+  const lifted = (a: A) => ret(f(a));
+  return (ma: Writer<A>) => composeWriter(id, lifted)(ma);
+}

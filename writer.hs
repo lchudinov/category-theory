@@ -20,3 +20,5 @@ toWords s = (words s, "toWords ")
 
 process :: String -> Writer [String]
 process = upCase >=> toWords
+
+fmap' f = id >=> (\x -> Writer.return (f x))
