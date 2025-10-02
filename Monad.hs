@@ -1,5 +1,8 @@
 module Monad where
-  
+import Data.Char (toUpper)
+
+-- The Kleisli Category
+
 class Monad m where
   (>=>) :: (a -> m b) -> (b -> m c) -> (a -> m c)
   return :: a -> m a
@@ -23,3 +26,28 @@ instance Monoid w => Monad.Monad (Writer w) where
   
 tell :: w -> Writer w ()
 tell s = Writer ((), s)
+
+-- Fish Anatomy
+
+-- (>=>) :: (a -> m b) -> (b -> m c) -> (a -> m c)
+-- f >=> g = \a -> let mb = f a in ..
+
+class MonadHaskell m where
+  (>>=) :: m a -> (a -> m b) -> m b
+  return2 :: a -> m a
+  
+instance Monoid w => MonadHaskell (Writer w) where
+  (Writer (a, w)) >>= f  =
+    let Writer (b, w') = f a
+    in Writer (b, w `mappend` w')
+  return2 a = Writer (a, mempty)
+
+class Functor m => BetterMonad m where
+  join :: m (m a) -> m a
+  return3 :: a -> m a
+  
+fmap f ma = ma Monad.>>= \a -> Monad.return (f a)
+
+join2 :: Monoid w => Writer w (Writer w a) -> Writer w a
+join2 (Writer ((Writer (a, w')), w)) = Writer (a, w `mappend` w')
+
