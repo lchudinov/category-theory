@@ -2,3 +2,4 @@
 *.hi
 node_modules
 *.exe
+*.kra*
