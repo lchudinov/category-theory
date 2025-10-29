@@ -31,5 +31,6 @@ function composeW<E, A, B, C>(
 const p = new Product(10, 'hi');
 const f = (w: Product<number, string>): number => w.a.length + w.e;
 const g = (w: Product<number, number>): string => `sum=${w.a + w.e}`;
-const h = composeW(f, g);
-console.log(h(p));
+const h = (w: Product<number, string>): string => `w.a=${w.a} w.e=${w.e}`;
+const i = composeW(composeW(f, g), h);
+console.log(i(p));
