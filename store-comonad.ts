@@ -1,54 +1,59 @@
-type Store<S, A> = {
-  peek: (s: S) => A; 
-  pos: S;           
+class Store<S, A> {
+  constructor(
+    public readonly peek: (s: S) => A,
+    public readonly pos: S
+  ) {}
+
+  extract(): A {
+    return this.peek(this.pos);
+  }
+
+  map<B>(f: (a: A) => B): Store<S, B> {
+    return new Store((s) => f(this.peek(s)), this.pos);
+  }
+
+  extend<B>(f: (store: Store<S, A>) => B): Store<S, B> {
+    return new Store((s) => f(new Store(this.peek, s)), this.pos);
+  }
+}
+
+
+const tape = (x: number) => x * x;
+const store = new Store<number, number>(tape, 2);
+
+console.log(store.extract());
+
+const sumOfNeighbors = (st: Store<number, number>) =>
+  st.peek(st.pos - 1) + st.peek(st.pos) + st.peek(st.pos + 1);
+
+const bracket = (st: Store<number, number>) =>
+  '[' + st.peek(st.pos) + ']';
+
+const extended = store.extend(sumOfNeighbors);
+const extended2 = extended.extend(bracket);
+
+console.log(extended2.extract());
+
+type Point = { x: number; y: number };
+const map = ({ x, y }: Point) => x + y;
+
+const world = new Store(map, { x: 1, y: 2 });
+console.log(world.extract()); // 3
+
+const neighborhoodSum = (st: Store<Point, number>) => {
+  const { x, y } = st.pos;
+  const deltas = [
+    { dx: -1, dy: 0 },
+    { dx: 1, dy: 0 },
+    { dx: 0, dy: -1 },
+    { dx: 0, dy: 1 },
+  ];
+  return deltas.reduce(
+    (sum, { dx, dy }) => sum + st.peek({ x: x + dx, y: y + dy }),
+    st.peek(st.pos)
+  );
 };
 
-function extract<S, A>(store: Store<S, A>): A {
-  console.log(`about to extract from`, store);
-  return store.peek(store.pos);
-}
+const extendedWorld = world.extend(neighborhoodSum);
+console.log(extendedWorld.extract()); // 15 — (3 + 2 + 4 + 1 + 5)
 
-function duplicate<S, A>(store: Store<S, A>): Store<S, Store<S, A>> {
-  return {
-    peek: (s) => ({ peek: store.peek, pos: s }),
-    pos: store.pos,
-  };
-}
-
-function extend<S, A, B>(store: Store<S, A>, f: (st: Store<S, A>) => B): Store<S, B> {
-  const duplicated = duplicate(store);
-  const result = {
-    peek: (s: S) => f(duplicated.peek(s)),
-    pos: store.pos,
-  };
-  console.log(`extended:`, result);
-  return result;
-}
-
-type State = number;
-type Cell = 0 | 1;
-
-const world: Record<number, Cell> = {
-  [-1]: 0,
-  [0]: 1,
-  [1]: 1,
-  [2]: 0,
-};
-
-const store: Store<State, Cell> = {
-  peek: (s) => world[s] ?? 0,
-  pos: 0,
-};
-
-function rule(s: Store<State, Cell>): Cell {
-  const left = s.peek(s.pos - 1);
-  const center = s.peek(s.pos);
-  const right = s.peek(s.pos + 1);
-  const sum = left + right - center;
-  return sum === 1 ? 1 : 0;
-}
-
-const nextGen = extend(store, rule);
-
-console.log("Текущее значение:", extract(store));      // 1
-console.log("Новое значение:", extract(nextGen));      // 0
