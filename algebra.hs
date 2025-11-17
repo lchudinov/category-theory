@@ -7,7 +7,7 @@ data MonF a = MEmpty | MAppend a a
 data RingF a = RZero
              | ROne
              | RAdd a a
-             | Mul a a
+             | RMul a a
              | RNeg a
              
 evalZ :: Algebra RingF Integer
