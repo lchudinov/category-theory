@@ -1,8 +1,8 @@
-export type Fix<F> = { unfix: F };
+type Fix<F> = { unfix: F };
 
-export const Fix = <F>(unfix: F): Fix<F> => ({ unfix });
+const Fix = <F>(unfix: F): Fix<F> => ({ unfix });
 
-export const cata =
+const cata =
   <F, A>(alg: (fa: F) => A, fmap: (fn: (x: any) => A) => (fa: F) => F) =>
   (term: Fix<F>): A =>
     alg(fmap((x) => cata(alg, fmap)(x))(term.unfix));
